@@ -4,7 +4,7 @@ import { requireCustomer } from "@/lib/auth/guards";
 import ToastMessage from "@/components/ToastMessage";
 import OrderQrCode from "@/components/OrderQrCode";
 
-// ---------- display-only helpers (no logic change) ----------
+// ─────────────────── display helpers ───────────────────
 function translateStatus(status: string) {
   switch (status) {
     case "pending":
@@ -42,32 +42,32 @@ function getStatusEmoji(status: string) {
 function getStatusClass(status: string) {
   switch (status) {
     case "pending":
-      return "bg-yellow-50 text-yellow-800 ring-yellow-200";
+      return "bg-amber-50 text-amber-800 ring-amber-200/80";
     case "confirmed":
-      return "bg-blue-50 text-blue-800 ring-blue-200";
+      return "bg-sky-50 text-sky-800 ring-sky-200/80";
     case "ready":
-      return "bg-green-50 text-green-800 ring-green-200";
+      return "bg-emerald-50 text-emerald-800 ring-emerald-200/80";
     case "delivered":
-      return "bg-emerald-50 text-emerald-800 ring-emerald-200";
+      return "bg-[#F2F7F0] text-[#48634C] ring-[#DDE8D9]";
     case "cancelled":
-      return "bg-red-50 text-red-700 ring-red-200";
+      return "bg-rose-50 text-rose-700 ring-rose-200/80";
     default:
-      return "bg-slate-50 text-slate-700 ring-slate-200";
+      return "bg-slate-50 text-slate-700 ring-slate-200/80";
   }
 }
 
 function getStatusDot(status: string) {
   switch (status) {
     case "pending":
-      return "bg-yellow-500";
+      return "bg-amber-500";
     case "confirmed":
-      return "bg-blue-500";
+      return "bg-sky-500";
     case "ready":
-      return "bg-green-500";
-    case "delivered":
       return "bg-emerald-500";
+    case "delivered":
+      return "bg-[#6B8B6E]";
     case "cancelled":
-      return "bg-red-500";
+      return "bg-rose-500";
     default:
       return "bg-slate-400";
   }
@@ -76,15 +76,15 @@ function getStatusDot(status: string) {
 function getAccentBar(status: string) {
   switch (status) {
     case "pending":
-      return "bg-gradient-to-b from-yellow-300 to-yellow-500";
+      return "bg-gradient-to-b from-amber-300 to-amber-500";
     case "confirmed":
-      return "bg-gradient-to-b from-blue-300 to-blue-500";
+      return "bg-gradient-to-b from-sky-300 to-sky-500";
     case "ready":
-      return "bg-gradient-to-b from-green-300 to-green-500";
-    case "delivered":
       return "bg-gradient-to-b from-emerald-300 to-emerald-500";
+    case "delivered":
+      return "bg-gradient-to-b from-[#A8C2A6] to-[#48634C]";
     case "cancelled":
-      return "bg-gradient-to-b from-red-300 to-red-500";
+      return "bg-gradient-to-b from-rose-300 to-rose-500";
     default:
       return "bg-gradient-to-b from-slate-300 to-slate-400";
   }
@@ -116,7 +116,7 @@ function timeAgo(dateStr: string) {
   return `${d} gün önce`;
 }
 
-// ---------- timeline component ----------
+// ─────────────────── timeline ───────────────────
 function StatusTimeline({ status }: { status: string }) {
   const steps = [
     { key: "pending", label: "Alındı" },
@@ -129,20 +129,41 @@ function StatusTimeline({ status }: { status: string }) {
 
   return (
     <div className="relative">
-      <div className="flex items-center justify-between">
+      {/* track */}
+      <div
+        aria-hidden
+        className="absolute left-[12.5%] right-[12.5%] top-[18px] h-[3px] rounded-full bg-[#EFE4D6]"
+      >
+        <div
+          className={`h-full rounded-full transition-all duration-700 ease-out ${
+            isCancelled
+              ? "bg-rose-300"
+              : "bg-gradient-to-r from-[#E59A6F] via-[#D67742] to-[#A24E22]"
+          }`}
+          style={{
+            width:
+              isCancelled || current < 0
+                ? "0%"
+                : `${(current / (steps.length - 1)) * 100}%`,
+          }}
+        />
+      </div>
+
+      {/* steps */}
+      <div className="relative flex items-start justify-between">
         {steps.map((step, i) => {
           const reached = !isCancelled && current >= i;
           const active = !isCancelled && current === i;
           return (
             <div key={step.key} className="flex flex-1 flex-col items-center">
               <div
-                className={`relative flex h-9 w-9 items-center justify-center rounded-full ring-4 transition ${
+                className={`relative flex h-9 w-9 items-center justify-center rounded-full ring-4 transition duration-300 ${
                   reached
-                    ? "bg-[#C96C3A] text-white ring-[#F4DCC8]"
+                    ? "bg-gradient-to-br from-[#D67742] to-[#A24E22] text-white ring-[#FFF1E1] shadow-[0_8px_18px_-8px_rgba(166,76,30,0.55)]"
                     : "bg-white text-[#9B7E6A] ring-[#EFE4D6]"
                 }`}
               >
-                {active && !isCancelled && (
+                {active && (
                   <span
                     aria-hidden
                     className="absolute inset-0 animate-ping rounded-full bg-[#C96C3A] opacity-30"
@@ -164,13 +185,11 @@ function StatusTimeline({ status }: { status: string }) {
                     />
                   </svg>
                 ) : (
-                  <span className="relative text-xs font-semibold">
-                    {i + 1}
-                  </span>
+                  <span className="relative text-xs font-bold">{i + 1}</span>
                 )}
               </div>
               <p
-                className={`mt-2 text-[10px] font-semibold uppercase tracking-wider sm:text-[11px] ${
+                className={`mt-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors duration-300 sm:text-[11px] ${
                   reached ? "text-[#2B1E16]" : "text-[#9B7E6A]"
                 }`}
               >
@@ -180,26 +199,11 @@ function StatusTimeline({ status }: { status: string }) {
           );
         })}
       </div>
-      <div className="absolute left-0 right-0 top-[18px] -z-0 mx-10 h-[3px] rounded-full bg-[#EFE4D6]">
-        <div
-          className={`h-full rounded-full transition-all duration-500 ${
-            isCancelled
-              ? "bg-red-300"
-              : "bg-gradient-to-r from-[#E59A6F] to-[#C96C3A]"
-          }`}
-          style={{
-            width:
-              isCancelled || current < 0
-                ? "0%"
-                : `${(current / (steps.length - 1)) * 100}%`,
-          }}
-        />
-      </div>
     </div>
   );
 }
 
-// ---------- page ----------
+// ─────────────────── page ───────────────────
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -252,14 +256,20 @@ export default async function DashboardPage({
     const totalPrice =
       order.total_price ?? order.price ?? order.packages?.price ?? 0;
     const isCancelled = order.status === "cancelled";
+    const hotelInitial =
+      (pkg.hotel_name ?? "")
+        .toString()
+        .trim()
+        .charAt(0)
+        .toUpperCase() || "?";
 
     return (
       <article
         key={order.id}
-        className={`group relative overflow-hidden rounded-3xl border bg-white transition ${
+        className={`group relative isolate overflow-hidden rounded-3xl border bg-white transition-all duration-300 ease-out ${
           isHistory
-            ? "border-[#E7D4C4]/70 shadow-[0_2px_8px_-4px_rgba(43,30,22,0.05)]"
-            : "border-[#E7D4C4] shadow-[0_8px_24px_-12px_rgba(43,30,22,0.08)] hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-18px_rgba(43,30,22,0.16)]"
+            ? "border-[#EFE4D6]/80 shadow-[0_2px_10px_-6px_rgba(43,30,22,0.06)]"
+            : "border-[#EFE4D6] shadow-[0_4px_18px_-8px_rgba(120,72,36,0.1)] hover:-translate-y-0.5 hover:border-[#E7C4A6] hover:shadow-[0_22px_44px_-18px_rgba(120,72,36,0.22)]"
         }`}
       >
         {/* colored accent bar */}
@@ -273,7 +283,7 @@ export default async function DashboardPage({
         <div className="relative p-5 sm:p-6">
           {/* header row */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-[#FFF8F0] px-3 py-1 font-mono text-[11px] font-semibold tracking-wider text-[#2B1E16] ring-1 ring-[#EFE4D6]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#FFF8F0] px-3 py-1 font-mono text-[11px] font-bold tracking-[0.16em] text-[#2B1E16] ring-1 ring-[#EFE4D6]">
               <span
                 aria-hidden
                 className="h-1.5 w-1.5 rounded-full bg-[#C96C3A]"
@@ -281,16 +291,25 @@ export default async function DashboardPage({
               #{shortId}
             </span>
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${getStatusClass(
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ring-1 ${getStatusClass(
                 order.status
               )}`}
             >
               <span
                 aria-hidden
-                className={`h-1.5 w-1.5 rounded-full ${getStatusDot(
+                className={`relative flex h-1.5 w-1.5 ${getStatusDot(
                   order.status
-                )}`}
-              />
+                )} rounded-full`}
+              >
+                {!isHistory && !isCancelled && (
+                  <span
+                    aria-hidden
+                    className={`absolute inline-flex h-full w-full animate-ping rounded-full ${getStatusDot(
+                      order.status
+                    )} opacity-70`}
+                  />
+                )}
+              </span>
               <span aria-hidden>{getStatusEmoji(order.status)}</span>
               {translateStatus(order.status)}
             </span>
@@ -319,36 +338,25 @@ export default async function DashboardPage({
             </span>
           </div>
 
-          {/* title & hotel */}
+          {/* title & venue */}
           <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <h3 className="truncate text-lg font-bold text-[#2B1E16] sm:text-xl">
+              <h3 className="truncate text-lg font-bold tracking-tight text-[#2B1E16] transition-colors duration-200 group-hover:text-[#7A4526] sm:text-xl">
                 {pkg.title ?? "Sürpriz Kutu"}
               </h3>
-              <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-[#6E5A4A]">
-                <svg
+              <div className="mt-1.5 inline-flex items-center gap-2">
+                <span
                   aria-hidden
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="h-3.5 w-3.5"
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#E8845A] to-[#A24E22] text-[10px] font-bold text-white shadow-sm"
                 >
-                  <path
-                    d="M4 21V8l8-5 8 5v13"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M9 21v-7h6v7"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                {pkg.hotel_name ?? "—"}
-              </p>
+                  {hotelInitial}
+                </span>
+                <p className="truncate text-sm font-medium text-[#6E5A4A]">
+                  {pkg.hotel_name ?? "—"}
+                </p>
+              </div>
               {(pkg.pickup_start || pkg.pickup_end) && (
-                <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#F2F7F0] px-3 py-1 text-xs font-medium text-[#48634C] ring-1 ring-[#DDE8D9]">
+                <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-[#F2F7F0] px-3 py-1 text-xs font-semibold text-[#48634C] ring-1 ring-[#DDE8D9]">
                   <svg
                     aria-hidden
                     viewBox="0 0 24 24"
@@ -360,12 +368,12 @@ export default async function DashboardPage({
                       cy="12"
                       r="9"
                       stroke="currentColor"
-                      strokeWidth="1.6"
+                      strokeWidth="1.8"
                     />
                     <path
                       d="M12 7v5l3 2"
                       stroke="currentColor"
-                      strokeWidth="1.6"
+                      strokeWidth="1.8"
                       strokeLinecap="round"
                     />
                   </svg>
@@ -378,25 +386,25 @@ export default async function DashboardPage({
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B7E6A]">
                 Toplam
               </p>
-              <p className="text-2xl font-extrabold text-[#C96C3A] sm:text-3xl">
+              <p className="bg-gradient-to-br from-[#7A4526] to-[#3F2618] bg-clip-text text-2xl font-extrabold tracking-tight text-transparent sm:text-3xl">
                 ₺{totalPrice}
               </p>
             </div>
           </div>
 
-          {/* timeline (only active orders) */}
+          {/* timeline (active orders only) */}
           {!isHistory && (
             <div className="mt-6 rounded-2xl border border-[#EFE4D6] bg-gradient-to-br from-[#FFFBF5] to-[#FFF8F0] p-5">
               <StatusTimeline status={order.status} />
             </div>
           )}
 
-          {/* premium pickup card */}
+          {/* premium pickup ticket */}
           {!isHistory && !isCancelled && (
-            <div className="mt-4 overflow-hidden rounded-3xl border border-[#E7D4C4] bg-white shadow-[0_4px_16px_-8px_rgba(43,30,22,0.08)]">
+            <div className="mt-4 overflow-hidden rounded-3xl border border-[#EFE0CC] bg-white shadow-[0_8px_24px_-12px_rgba(43,30,22,0.12)]">
               {/* eyebrow */}
-              <div className="flex items-center justify-between bg-gradient-to-r from-[#FFF1E1] via-[#FFE8D2] to-[#FFF1E1] px-5 py-2.5">
-                <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[#B85E2E]">
+              <div className="flex items-center justify-between bg-gradient-to-r from-[#FFF1E1] via-[#FFE3C2] to-[#FFF1E1] px-5 py-2.5">
+                <span className="inline-flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#A24E22]">
                   <svg
                     aria-hidden
                     viewBox="0 0 24 24"
@@ -406,7 +414,7 @@ export default async function DashboardPage({
                     <path
                       d="M9 12l2 2 4-4"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="2.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
@@ -415,29 +423,29 @@ export default async function DashboardPage({
                       cy="12"
                       r="9"
                       stroke="currentColor"
-                      strokeWidth="1.6"
+                      strokeWidth="1.8"
                     />
                   </svg>
                   Teslim Alma Bileti
                 </span>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#B85E2E]/70">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#A24E22]/80">
                   İşletmede göster
                 </span>
               </div>
 
-              <div className="grid gap-5 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6">
+              <div className="grid gap-5 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6 sm:p-6">
                 {/* left: pickup code */}
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9B7E6A]">
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#9B7E6A]">
                     Teslim Kodu
                   </p>
                   <p
-                    className="mt-2 break-all font-mono text-3xl font-extrabold tracking-[0.3em] text-[#2B1E16] sm:text-4xl"
+                    className="mt-2 break-all bg-gradient-to-br from-[#2B1E16] to-[#5A3A27] bg-clip-text font-mono text-3xl font-extrabold tracking-[0.3em] text-transparent sm:text-4xl"
                     aria-label={`Teslim kodu ${pickupCode}`}
                   >
                     {pickupCode}
                   </p>
-                  <p className="mt-3 inline-flex items-start gap-1.5 text-xs text-[#6E5A4A]">
+                  <p className="mt-3 inline-flex items-start gap-1.5 text-xs leading-5 text-[#6E5A4A]">
                     <svg
                       aria-hidden
                       viewBox="0 0 24 24"
@@ -451,29 +459,30 @@ export default async function DashboardPage({
                         strokeLinejoin="round"
                       />
                     </svg>
-                    Bu kodu işletmeye söyleyin veya QR’ı okutun.
+                    Bu kodu işletmeye söyleyin veya QR'ı okutun.
                   </p>
                 </div>
 
                 {/* right: QR */}
                 <div className="flex items-center justify-center">
-                  <div className="relative rounded-2xl border border-[#EFE4D6] bg-white p-3 shadow-[0_2px_8px_-4px_rgba(43,30,22,0.08)]">
+                  <div className="relative rounded-2xl border border-[#EFE4D6] bg-white p-3 shadow-[0_8px_20px_-10px_rgba(43,30,22,0.18)] transition group-hover:scale-[1.02]">
                     <OrderQrCode value={pickupCode} />
+                    {/* corner brackets */}
                     <span
                       aria-hidden
-                      className="pointer-events-none absolute -left-1 -top-1 h-3 w-3 rounded-tl-md border-l-2 border-t-2 border-[#C96C3A]"
+                      className="pointer-events-none absolute -left-1 -top-1 h-3.5 w-3.5 rounded-tl-md border-l-[2.5px] border-t-[2.5px] border-[#C96C3A]"
                     />
                     <span
                       aria-hidden
-                      className="pointer-events-none absolute -right-1 -top-1 h-3 w-3 rounded-tr-md border-r-2 border-t-2 border-[#C96C3A]"
+                      className="pointer-events-none absolute -right-1 -top-1 h-3.5 w-3.5 rounded-tr-md border-r-[2.5px] border-t-[2.5px] border-[#C96C3A]"
                     />
                     <span
                       aria-hidden
-                      className="pointer-events-none absolute -bottom-1 -left-1 h-3 w-3 rounded-bl-md border-b-2 border-l-2 border-[#C96C3A]"
+                      className="pointer-events-none absolute -bottom-1 -left-1 h-3.5 w-3.5 rounded-bl-md border-b-[2.5px] border-l-[2.5px] border-[#C96C3A]"
                     />
                     <span
                       aria-hidden
-                      className="pointer-events-none absolute -bottom-1 -right-1 h-3 w-3 rounded-br-md border-b-2 border-r-2 border-[#C96C3A]"
+                      className="pointer-events-none absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-br-md border-b-[2.5px] border-r-[2.5px] border-[#C96C3A]"
                     />
                   </div>
                 </div>
@@ -483,47 +492,55 @@ export default async function DashboardPage({
               <div className="relative h-3 border-t border-dashed border-[#EFE4D6]">
                 <span
                   aria-hidden
-                  className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-[#FCF8F3]"
+                  className="absolute -left-2 -top-2 h-4 w-4 rounded-full bg-[#FCF8F3]"
                 />
                 <span
                   aria-hidden
-                  className="absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full bg-[#FCF8F3]"
+                  className="absolute -right-2 -top-2 h-4 w-4 rounded-full bg-[#FCF8F3]"
                 />
               </div>
 
               {/* ticket footer */}
-              <div className="flex items-center justify-between bg-[#FFFBF5] px-5 py-2.5 text-[11px] text-[#9B7E6A]">
-                <span className="font-mono tracking-wider">
+              <div className="flex items-center justify-between bg-[#FFFBF5] px-5 py-3 text-[11px] text-[#9B7E6A]">
+                <span className="inline-flex items-center gap-1.5 font-mono tracking-[0.16em]">
+                  <span
+                    aria-hidden
+                    className="h-1.5 w-1.5 rounded-full bg-[#C96C3A]"
+                  />
                   EAT IN · #{shortId}
                 </span>
-                <span className="truncate">{pkg.hotel_name ?? "—"}</span>
+                <span className="truncate font-medium">
+                  {pkg.hotel_name ?? "—"}
+                </span>
               </div>
             </div>
           )}
 
           {/* cancelled banner */}
           {!isHistory && isCancelled && (
-            <div className="mt-4 flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-              <svg
-                aria-hidden
-                viewBox="0 0 24 24"
-                fill="none"
-                className="h-4 w-4"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="9"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                />
-                <path
-                  d="M8 8l8 8M16 8l-8 8"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
+            <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-rose-200 bg-rose-50/70 px-4 py-3 text-sm font-medium text-rose-700">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-rose-100 ring-1 ring-rose-200">
+                <svg
+                  aria-hidden
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-3.5 w-3.5"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  />
+                  <path
+                    d="M8 8l8 8M16 8l-8 8"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
               Bu sipariş iptal edildi.
             </div>
           )}
@@ -541,20 +558,22 @@ export default async function DashboardPage({
                   <path
                     d="M3 12a9 9 0 1 0 3-6.7"
                     stroke="currentColor"
-                    strokeWidth="1.6"
+                    strokeWidth="1.8"
                     strokeLinecap="round"
                   />
                   <path
                     d="M3 4v5h5"
                     stroke="currentColor"
-                    strokeWidth="1.6"
+                    strokeWidth="1.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
                 Sipariş kapandı
               </span>
-              <span className="font-mono">{timeAgo(order.created_at)}</span>
+              <span className="font-mono tracking-wide">
+                {timeAgo(order.created_at)}
+              </span>
             </div>
           )}
 
@@ -563,14 +582,14 @@ export default async function DashboardPage({
             <div className="mt-4 flex justify-end">
               <Link
                 href={`/paket/${pkg.id}`}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#E7D4C4] bg-white px-3 py-1.5 text-xs font-semibold text-[#7A4526] transition hover:bg-[#FFF8F0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C96C3A]/40"
+                className="group/det inline-flex items-center gap-1.5 rounded-full border border-[#E7D4C4] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#7A4526] transition-all duration-200 hover:-translate-y-px hover:border-[#C96C3A] hover:bg-[#FFF8F0] hover:text-[#C96C3A] hover:shadow-[0_8px_18px_-10px_rgba(201,108,58,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C96C3A]/40"
               >
-                Detaya Git
+                Detaya git
                 <svg
                   aria-hidden
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="h-3 w-3"
+                  className="h-3 w-3 transition-transform duration-200 group-hover/det:translate-x-0.5"
                 >
                   <path
                     d="M9 5l7 7-7 7"
@@ -589,47 +608,49 @@ export default async function DashboardPage({
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#FCF8F3]">
+    <main className="relative min-h-screen overflow-hidden bg-[#FBF6EF] text-[#2B1E16] antialiased">
       {params.success === "order_created" && (
         <ToastMessage message="Siparişin başarıyla oluşturuldu!" />
       )}
 
-      {/* decorative blobs */}
+      {/* ambient blobs */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 top-0 h-72 w-72 rounded-full bg-[#F4DCC8] opacity-40 blur-3xl"
+        className="pointer-events-none absolute -left-32 top-0 h-80 w-80 rounded-full bg-gradient-to-br from-[#FFE3C2] via-[#F4D4B3] to-transparent opacity-50 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-32 top-40 h-72 w-72 rounded-full bg-[#DDE8D9] opacity-40 blur-3xl"
+        className="pointer-events-none absolute -right-32 top-40 h-80 w-80 rounded-full bg-gradient-to-br from-[#DDE8D9] to-transparent opacity-50 blur-3xl"
       />
 
-      <div className="relative mx-auto max-w-5xl px-4 py-10 sm:py-14">
-        {/* header */}
-        <header className="mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#B85E2E] ring-1 ring-[#EFE4D6] backdrop-blur">
-            <span
-              aria-hidden
-              className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#C96C3A]"
-            />
+      <div className="relative mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+        {/* ─────────── HEADER ─────────── */}
+        <header className="mb-10 sm:mb-12">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#EFE0CC] bg-white/80 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#A24E22] shadow-sm backdrop-blur">
+            <span className="relative flex h-1.5 w-1.5" aria-hidden>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#C96C3A] opacity-70" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#C96C3A]" />
+            </span>
             Müşteri Paneli
           </div>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#2B1E16] sm:text-4xl">
+
+          <h1 className="mt-4 text-[2.25rem] font-bold leading-[1.05] tracking-[-0.025em] text-[#2B1E16] sm:text-[2.75rem] lg:text-[3.25rem]">
             Siparişlerim
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-[#6E5A4A]">
-            Aktif siparişlerinizi takip edin, teslim kodu ve QR ile kutunuzu
-            kolayca alın.
+          <p className="mt-3 max-w-xl text-[15px] leading-7 text-[#6E5A4A]">
+            Aktif siparişlerini takip et, teslim kodu ve QR ile kutunu kolayca
+            al.
           </p>
 
+          {/* success banner */}
           {params.success === "order_created" && (
             <div
               role="status"
-              className="mt-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+              className="mt-6 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-[#F2F7F0] px-4 py-3.5 text-sm font-medium text-emerald-800 shadow-[0_8px_24px_-16px_rgba(72,99,76,0.4)]"
             >
               <span
                 aria-hidden
-                className="mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white"
+                className="mt-0.5 inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-[#48634C] text-white shadow-[0_6px_14px_-6px_rgba(72,99,76,0.6)]"
               >
                 <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
                   <path
@@ -649,51 +670,104 @@ export default async function DashboardPage({
           )}
 
           {/* stat strip */}
-          <div className="mt-6 grid grid-cols-3 gap-3 sm:gap-4">
-            <div className="rounded-2xl border border-[#E7D4C4] bg-white px-4 py-3 shadow-[0_2px_8px_-4px_rgba(43,30,22,0.05)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B7E6A]">
-                Toplam
-              </p>
-              <p className="mt-1 text-2xl font-extrabold text-[#2B1E16]">
+          <div className="mt-7 grid grid-cols-3 gap-3 sm:gap-4">
+            <div className="group relative overflow-hidden rounded-2xl border border-[#EFE0CC] bg-white px-4 py-3.5 shadow-[0_2px_12px_rgba(120,72,36,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-12px_rgba(120,72,36,0.18)] sm:px-5 sm:py-4">
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFF8F0] to-[#FFE8C9] text-[#C96C3A] ring-1 ring-[#F4D4B3]/60">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+                    <path
+                      d="M3 7h18l-1.5 11a2 2 0 0 1-2 1.7H6.5A2 2 0 0 1 4.5 18L3 7z"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M8 7V5a4 4 0 0 1 8 0v2"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B7E6A]">
+                  Toplam
+                </p>
+              </div>
+              <p className="mt-2 text-2xl font-extrabold tracking-tight text-[#2B1E16] sm:text-3xl">
                 {totalCount}
               </p>
             </div>
-            <div className="rounded-2xl border border-[#E7D4C4] bg-white px-4 py-3 shadow-[0_2px_8px_-4px_rgba(43,30,22,0.05)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B7E6A]">
-                Aktif
-              </p>
-              <p className="mt-1 text-2xl font-extrabold text-[#C96C3A]">
+
+            <div className="group relative overflow-hidden rounded-2xl border border-[#EFE0CC] bg-white px-4 py-3.5 shadow-[0_2px_12px_rgba(120,72,36,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-12px_rgba(120,72,36,0.18)] sm:px-5 sm:py-4">
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFE3C2] to-[#F0B886] text-white ring-1 ring-[#E59A6F]/60">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="9"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    />
+                    <path
+                      d="M12 7v5l3 2"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B7E6A]">
+                  Aktif
+                </p>
+              </div>
+              <p className="mt-2 bg-gradient-to-br from-[#D67742] to-[#A24E22] bg-clip-text text-2xl font-extrabold tracking-tight text-transparent sm:text-3xl">
                 {activeCount}
               </p>
             </div>
-            <div className="rounded-2xl border border-[#E7D4C4] bg-white px-4 py-3 shadow-[0_2px_8px_-4px_rgba(43,30,22,0.05)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B7E6A]">
-                Tamamlanan
-              </p>
-              <p className="mt-1 text-2xl font-extrabold text-[#48634C]">
+
+            <div className="group relative overflow-hidden rounded-2xl border border-[#DDE8D9] bg-white px-4 py-3.5 shadow-[0_2px_12px_rgba(72,99,76,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-12px_rgba(72,99,76,0.16)] sm:px-5 sm:py-4">
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#F2F7F0] to-[#DDE8D9] text-[#48634C] ring-1 ring-[#C9D9C6]/60">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+                    <path
+                      d="M5 12.5l4 4L19 7"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#5F7262]">
+                  Tamamlanan
+                </p>
+              </div>
+              <p className="mt-2 text-2xl font-extrabold tracking-tight text-[#48634C] sm:text-3xl">
                 {deliveredCount}
               </p>
             </div>
           </div>
         </header>
 
-        {/* empty state */}
+        {/* ─────────── EMPTY STATE ─────────── */}
         {totalCount === 0 && (
-          <section className="relative overflow-hidden rounded-3xl border border-[#E7D4C4] bg-white p-8 text-center shadow-[0_8px_24px_-12px_rgba(43,30,22,0.08)] sm:p-10">
+          <section className="relative overflow-hidden rounded-3xl border border-[#EFE0CC] bg-gradient-to-br from-white to-[#FCF8F3] p-8 text-center shadow-[0_8px_24px_-12px_rgba(120,72,36,0.1)] sm:p-14">
             <div
               aria-hidden
-              className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-[#FFE8D2] opacity-60 blur-2xl"
+              className="pointer-events-none absolute -left-12 -top-12 h-48 w-48 rounded-full bg-gradient-to-br from-[#FFE3C2] to-transparent opacity-70 blur-3xl"
             />
             <div
               aria-hidden
-              className="pointer-events-none absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-[#DDE8D9] opacity-60 blur-2xl"
+              className="pointer-events-none absolute -bottom-12 -right-12 h-48 w-48 rounded-full bg-gradient-to-br from-[#DDE8D9] to-transparent opacity-60 blur-3xl"
             />
-            <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FFE8D2] to-[#F4DCC8] ring-1 ring-[#EFE4D6]">
+
+            <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-[#FFE3C2] to-[#F4D4B3] shadow-inner ring-1 ring-[#F4D4B3]/60">
               <svg
                 aria-hidden
                 viewBox="0 0 24 24"
                 fill="none"
-                className="h-7 w-7 text-[#C96C3A]"
+                className="h-9 w-9 text-[#C96C3A]"
               >
                 <path
                   d="M3 7h18l-1.5 11a2 2 0 0 1-2 1.7H6.5A2 2 0 0 1 4.5 18L3 7z"
@@ -709,28 +783,29 @@ export default async function DashboardPage({
                 />
               </svg>
             </div>
-            <h2 className="relative mt-5 text-xl font-bold text-[#2B1E16]">
+
+            <h2 className="relative mt-6 text-xl font-bold tracking-tight text-[#2B1E16] sm:text-2xl">
               Henüz siparişin yok
             </h2>
-            <p className="relative mx-auto mt-2 max-w-md text-sm text-[#6E5A4A]">
+            <p className="relative mx-auto mt-2 max-w-md text-sm leading-6 text-[#6E5A4A]">
               Yakındaki sürpriz kutuları keşfet, lezzetli ve uygun fiyatlı bir
               başlangıç yap.
             </p>
             <Link
               href="/"
-              className="relative mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#C96C3A] to-[#B85E2E] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(184,94,46,0.6)] transition hover:shadow-[0_12px_28px_-10px_rgba(184,94,46,0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C96C3A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FCF8F3]"
+              className="group relative mt-7 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-[#D67742] to-[#A24E22] px-6 py-3 text-sm font-bold text-white shadow-[0_12px_28px_-10px_rgba(166,76,30,0.65)] ring-1 ring-white/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_36px_-12px_rgba(166,76,30,0.78)] hover:brightness-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C96C3A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EF] active:translate-y-px"
             >
-              Keşfetmeye Git
+              Keşfetmeye git
               <svg
                 aria-hidden
                 viewBox="0 0 24 24"
                 fill="none"
-                className="h-4 w-4"
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
               >
                 <path
                   d="M5 12h14M13 5l7 7-7 7"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="2.4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
@@ -739,76 +814,138 @@ export default async function DashboardPage({
           </section>
         )}
 
-        {/* active section */}
+        {/* ─────────── ACTIVE ─────────── */}
         {activeOrders.length > 0 && (
           <section className="mb-12">
-            <div className="mb-4 flex items-center gap-3">
-              <h2 className="text-lg font-bold text-[#2B1E16]">
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FFE3C2] to-[#F0B886] text-[#A24E22] ring-1 ring-[#F4D4B3]/60">
+                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  />
+                  <path
+                    d="M12 7v5l3 2"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+              <h2 className="text-lg font-bold tracking-tight text-[#2B1E16] sm:text-xl">
                 Aktif siparişler
               </h2>
-              <span className="inline-flex h-6 items-center justify-center rounded-full bg-[#C96C3A] px-2 text-xs font-bold text-white">
+              <span className="inline-flex h-6 items-center justify-center rounded-full bg-gradient-to-br from-[#D67742] to-[#A24E22] px-2 text-xs font-extrabold text-white shadow-[0_6px_14px_-6px_rgba(166,76,30,0.55)]">
                 {activeCount}
               </span>
-              <span className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-medium text-[#48634C]">
-                <span
-                  aria-hidden
-                  className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#48634C]"
-                />
+              <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#F2F7F0] px-2.5 py-1 text-[11px] font-semibold text-[#48634C] ring-1 ring-[#DDE8D9]">
+                <span className="relative flex h-1.5 w-1.5" aria-hidden>
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#6B8B6E] opacity-70" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#6B8B6E]" />
+                </span>
                 Canlı takip
               </span>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 sm:space-y-5">
               {activeOrders.map((o) => renderOrderCard(o, false))}
             </div>
           </section>
         )}
 
-        {/* history section */}
+        {/* ─────────── HISTORY ─────────── */}
         {historyOrders.length > 0 && (
           <section>
-            <div className="mb-4 flex items-center gap-3">
-              <h2 className="text-lg font-bold text-[#2B1E16]">Geçmiş</h2>
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-[#F2F7F0] to-[#DDE8D9] text-[#48634C] ring-1 ring-[#C9D9C6]/60">
+                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+                  <path
+                    d="M3 12a9 9 0 1 0 3-6.7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M3 4v5h5"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              <h2 className="text-lg font-bold tracking-tight text-[#2B1E16] sm:text-xl">
+                Geçmiş
+              </h2>
               <span className="inline-flex h-6 items-center justify-center rounded-full bg-[#EFE4D6] px-2 text-xs font-bold text-[#6E5A4A]">
                 {historyOrders.length}
               </span>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 sm:space-y-4">
               {historyOrders.map((o) => renderOrderCard(o, true))}
             </div>
           </section>
         )}
 
-        {/* explore CTA when there are orders */}
+        {/* ─────────── EXPLORE CTA ─────────── */}
         {totalCount > 0 && (
-          <div className="mt-10 flex flex-col items-center gap-3 rounded-3xl border border-[#E7D4C4] bg-white p-6 text-center shadow-[0_4px_16px_-8px_rgba(43,30,22,0.06)] sm:flex-row sm:justify-between sm:text-left">
-            <div>
-              <p className="text-sm font-bold text-[#2B1E16]">
-                Yeni sürpriz kutular bekliyor
-              </p>
-              <p className="mt-0.5 text-xs text-[#6E5A4A]">
-                Yakındaki işletmelerden günün fırsatlarını keşfet.
-              </p>
-            </div>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#C96C3A] to-[#B85E2E] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(184,94,46,0.6)] transition hover:shadow-[0_12px_28px_-10px_rgba(184,94,46,0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C96C3A] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-            >
-              Keşfetmeye Git
-              <svg
-                aria-hidden
-                viewBox="0 0 24 24"
-                fill="none"
-                className="h-4 w-4"
+          <div className="relative mt-12 overflow-hidden rounded-3xl border border-[#EFE0CC] bg-gradient-to-br from-white via-[#FCF8F3] to-[#FFE8C9]/40 p-6 shadow-[0_8px_24px_-12px_rgba(120,72,36,0.1)] sm:p-7">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br from-[#FFE3C2] to-transparent opacity-70 blur-3xl"
+            />
+            <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3 sm:items-center">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D67742] to-[#A24E22] text-white shadow-[0_10px_24px_-10px_rgba(166,76,30,0.6)] ring-1 ring-white/30">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+                    <path
+                      d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="m3.3 7 8.7 5 8.7-5M12 22V12"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <div>
+                  <p className="text-base font-bold tracking-tight text-[#2B1E16] sm:text-lg">
+                    Yeni sürpriz kutular bekliyor
+                  </p>
+                  <p className="mt-0.5 text-sm text-[#6E5A4A]">
+                    Yakındaki işletmelerden günün fırsatlarını keşfet.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/"
+                className="group inline-flex shrink-0 items-center gap-2 rounded-2xl bg-gradient-to-br from-[#D67742] to-[#A24E22] px-5 py-3 text-sm font-bold text-white shadow-[0_12px_28px_-10px_rgba(166,76,30,0.65)] ring-1 ring-white/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-12px_rgba(166,76,30,0.75)] hover:brightness-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C96C3A] focus-visible:ring-offset-2 focus-visible:ring-offset-white active:translate-y-px"
               >
-                <path
-                  d="M5 12h14M13 5l7 7-7 7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Link>
+                Keşfetmeye git
+                <svg
+                  aria-hidden
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                >
+                  <path
+                    d="M5 12h14M13 5l7 7-7 7"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Link>
+            </div>
           </div>
         )}
       </div>
