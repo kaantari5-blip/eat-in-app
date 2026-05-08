@@ -257,7 +257,7 @@ for (let i = 6; i >= 0; i--) {
         </section>
 
   {/* Stats */}
-<section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-7">
+<section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
   <div className="rounded-[1.5rem] border border-[#E8D7C7] bg-[#FFFDF9] p-5 shadow">
     <p className="text-xs font-medium uppercase tracking-wider text-[#8A7768]">
       Toplam kutu
@@ -361,7 +361,7 @@ for (let i = 6; i >= 0; i--) {
                       }`}
                       aria-hidden="true"
                     />
-<div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
+<div className="-mx-5 -mt-5 mb-5 h-52 overflow-hidden rounded-t-[1.5rem] sm:-mx-6 sm:-mt-6">
   <img
     src={pkg.image_url || "/placeholder.jpg"}
     alt={pkg.title}
@@ -370,12 +370,6 @@ for (let i = 6; i >= 0; i--) {
 
   {/* Gradient overlay */}
   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
-  {/* Title üstüne */}
-  <div className="absolute bottom-3 left-4 text-white">
-    <p className="text-sm opacity-80">{pkg.hotel_name}</p>
-    <h3 className="text-xl font-bold">{pkg.title}</h3>
-  </div>
 </div>
 
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
