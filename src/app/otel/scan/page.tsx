@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
 import { useSearchParams } from "next/navigation";
 
 function ScanPageInner() {
@@ -11,18 +11,16 @@ function ScanPageInner() {
   const [loading, setLoading] = useState(false);
   const [cameraOn, setCameraOn] = useState(false);
   const [message, setMessage] = useState("");
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastCodeRef = useRef("");
 
   useEffect(() => {
     const codeFromUrl = params.get("code");
-    if (codeFromUrl) {
-      setCode(codeFromUrl);
-    }
+    if (codeFromUrl) setCode(codeFromUrl);
   }, [params]);
 
   async function deliverOrder(pickupCode: string) {
-    const cleanCode = pickupCode.trim();
+    const cleanCode = pickupCode.trim().toUpperCase();
 
     if (!cleanCode || loading) return;
     if (lastCodeRef.current === cleanCode) return;
@@ -51,7 +49,8 @@ function ScanPageInner() {
 
       setMessage("✅ Sipariş teslim edildi!");
       setCode("");
-      setCameraOn(false);
+      lastCodeRef.current = "";
+      await stopCamera();
     } catch (err) {
       console.error(err);
       setMessage("❌ Hata oluştu.");
@@ -61,43 +60,64 @@ function ScanPageInner() {
     }
   }
 
+  async function stopCamera() {
+    try {
+      if (scannerRef.current?.isScanning) {
+        await scannerRef.current.stop();
+      }
+
+      await scannerRef.current?.clear();
+    } catch (err) {
+      console.warn("Camera stop error:", err);
+    } finally {
+      scannerRef.current = null;
+      setCameraOn(false);
+    }
+  }
+
+  async function startCamera() {
+    setMessage("");
+
+    try {
+      await stopCamera();
+
+      setCameraOn(true);
+
+      setTimeout(async () => {
+        try {
+          const qr = new Html5Qrcode("qr-reader");
+          scannerRef.current = qr;
+
+          await qr.start(
+            { facingMode: "environment" },
+            {
+              fps: 10,
+              qrbox: { width: 220, height: 220 },
+              aspectRatio: 1,
+            },
+            async (decodedText) => {
+              await deliverOrder(decodedText);
+            },
+            () => {}
+          );
+        } catch (err) {
+          console.error("Camera start error:", err);
+          setMessage("❌ Kamera başlatılamadı. İzni kontrol et veya fotoğraf yükle.");
+          setCameraOn(false);
+        }
+      }, 300);
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Kamera açılamadı.");
+      setCameraOn(false);
+    }
+  }
+
   useEffect(() => {
-    if (!cameraOn) return;
-
-    const style = document.createElement("style");
-    style.innerHTML = `
-      #qr-reader__dashboard_section,
-      #qr-reader__header_message {
-        display: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    const scanner = new Html5QrcodeScanner(
-      "qr-reader",
-      {
-        fps: 10,
-        qrbox: { width: 220, height: 220 },
-      },
-      false
-    );
-
-    scannerRef.current = scanner;
-
-    scanner.render(
-      (decodedText) => {
-        deliverOrder(decodedText);
-      },
-      () => {}
-    );
-
     return () => {
-      scanner.clear().catch(() => {});
-      if (style.parentNode) {
-        document.head.removeChild(style);
-      }
+      stopCamera();
     };
-  }, [cameraOn]);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -114,15 +134,24 @@ function ScanPageInner() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const { Html5Qrcode } = await import("html5-qrcode");
-    const html5QrCode = new Html5Qrcode("qr-reader");
+    setMessage("");
 
     try {
-      const result = await html5QrCode.scanFile(file, true);
+      await stopCamera();
+
+      const qr = new Html5Qrcode("qr-reader");
+      scannerRef.current = qr;
+
+      const result = await qr.scanFile(file, true);
+      await qr.clear();
+
       await deliverOrder(result);
     } catch (err) {
       console.error(err);
       setMessage("❌ QR okunamadı.");
+    } finally {
+      scannerRef.current = null;
+      e.target.value = "";
     }
   }
 
@@ -153,25 +182,26 @@ function ScanPageInner() {
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => setCameraOn(true)}
-            disabled={loading}
+            onClick={startCamera}
+            disabled={loading || cameraOn}
             className="flex-1 rounded-xl bg-black py-3 text-sm font-semibold text-white disabled:opacity-60"
           >
-            Kamerayı Aç 📷
+            {cameraOn ? "Kamera Açık 📷" : "Kamerayı Aç 📷"}
           </button>
 
           <button
             type="button"
-            onClick={() => setCameraOn(false)}
-            disabled={loading}
+            onClick={stopCamera}
+            disabled={loading || !cameraOn}
             className="flex-1 rounded-xl bg-gray-200 py-3 text-sm font-semibold text-black disabled:opacity-60"
           >
             Kapat ❌
           </button>
         </div>
-        <p className="mt-3 rounded-xl bg-yellow-50 px-4 py-3 text-xs text-yellow-800">
-  Kamera Safari’de siyah görünürse Chrome ile açmayı deneyin.
-</p>
+
+        <p className="rounded-xl bg-yellow-50 px-4 py-3 text-xs text-yellow-800">
+          Kamera siyah görünürse sayfayı yenileyip tekrar açın veya fotoğraf yükleme seçeneğini kullanın.
+        </p>
 
         <label className="block w-full">
           <span className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C96C3A] to-[#B85E2E] py-3 text-sm font-semibold text-white shadow">
@@ -188,10 +218,10 @@ function ScanPageInner() {
 
         <div
           id="qr-reader"
-          className={`overflow-hidden rounded-2xl border ${
-            cameraOn ? "bg-black" : "hidden bg-white"
+          className={`overflow-hidden rounded-2xl border bg-black ${
+            cameraOn ? "block" : "hidden"
           }`}
-          style={{ minHeight: cameraOn ? "240px" : "0px" }}
+          style={{ minHeight: cameraOn ? "260px" : "0px" }}
         />
 
         <button
@@ -212,18 +242,7 @@ function ScanPageFallback() {
       <h1 className="mb-2 text-center text-2xl font-bold text-[#2B1E16]">
         Sipariş Teslim Et
       </h1>
-      <p className="mb-4 text-center text-sm text-[#6B5B4D]">
-        Yükleniyor...
-      </p>
-      <div className="space-y-4" aria-busy="true">
-        <div className="h-12 w-full animate-pulse rounded-xl border border-[#E7D4C4] bg-[#F7ECDF]/40" />
-        <div className="flex gap-2">
-          <div className="h-12 flex-1 animate-pulse rounded-xl bg-black/70" />
-          <div className="h-12 flex-1 animate-pulse rounded-xl bg-gray-200" />
-        </div>
-        <div className="h-12 w-full animate-pulse rounded-xl bg-[#C96C3A]/60" />
-        <div className="h-12 w-full animate-pulse rounded-xl bg-[#48634C]/70" />
-      </div>
+      <p className="text-center text-sm text-[#6B5B4D]">Yükleniyor...</p>
     </div>
   );
 }
