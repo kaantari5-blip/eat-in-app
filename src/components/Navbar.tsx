@@ -31,7 +31,7 @@ export default async function Navbar() {
   <img
     src="/logo.png"
     alt="Eat In"
-    className="h-24 w-auto object-contain"
+    className="h-44 w-auto object-contain"
   />
 </Link>
 
