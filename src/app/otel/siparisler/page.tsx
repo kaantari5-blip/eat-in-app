@@ -350,9 +350,7 @@ export default async function HotelOrdersPage({
       <NewOrderHighlighter />
 
       <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8">
-        <div className="rounded-xl border bg-white p-3 text-xs text-red-600">
-  DEBUG: myPackageIds: {myPackageIds.length} | orders: {orders.length} | filtered: {filteredOrders.length}
-</div>
+        
         <Link
           href="/otel"
           className="group inline-flex items-center gap-1.5 text-sm font-medium text-[#9B7E6A] transition hover:text-[#C96C3A]"
