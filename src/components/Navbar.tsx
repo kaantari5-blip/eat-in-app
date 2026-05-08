@@ -36,19 +36,15 @@ export default async function Navbar() {
             <img src="/logo.png" alt="Eat In" className="h-14 w-auto" />
           </Link>
 
-          {/* Center nav links — desktop only */}
-          <nav className="hidden items-center gap-1 md:flex">
-            <NavLink href="/">Keşfet</NavLink>
-
-            {user && <NavLink href="/dashboard">Siparişlerim</NavLink>}
-            {user && <NavLink href="/favoriler">Favorilerim</NavLink>}
-            {user && role === "hotel_owner" && (
-              <NavLink href="/otel">İşletme Paneli</NavLink>
-            )}
-          </nav>
-
           {/* Right-side actions — desktop */}
           <div className="hidden items-center gap-2 md:flex">
+            <NavLink href="/">Keşfet</NavLink>
+
+{user && <NavLink href="/dashboard">Siparişlerim</NavLink>}
+{user && <NavLink href="/favoriler">Favorilerim</NavLink>}
+{user && role === "hotel_owner" && (
+  <NavLink href="/otel">İşletme Paneli</NavLink>
+)}
             {user ? (
               <>
                 {/* Avatar + email pill */}
