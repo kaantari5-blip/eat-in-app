@@ -27,22 +27,12 @@ export default async function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#E7D4C4] bg-white/70 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center">
   <img
     src="/logo.png"
     alt="Eat In"
-    className="h-11 w-auto"
+    className="h-20 w-auto object-contain"
   />
-
-  <div>
-    <p className="text-sm font-semibold text-[#2B1E16]">
-      Eat In
-    </p>
-
-    <p className="text-xs text-[#8A7768]">
-      Sürpriz kutular
-    </p>
-  </div>
 </Link>
 
         <nav className="hidden items-center gap-3 md:flex">
