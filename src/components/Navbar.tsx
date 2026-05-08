@@ -111,7 +111,7 @@ export default async function Navbar() {
     <span className="text-xl leading-none">☰</span>
   </summary>
 
-  <div className="absolute right-0 mt-3 w-[292px] max-w-[86vw] overflow-hidden rounded-[1.75rem] border border-white/60 bg-white/85 shadow-[0_20px_60px_rgba(43,30,22,0.18)] backdrop-blur-2xl">
+  <div className="absolute right-0 mt-3 w-[292px] max-w-[86vw] overflow-hidden rounded-[1.75rem] border border-white/60 bg-white/85 shadow-[0_20px_60px_rgba(43,30,22,0.18)] backdrop-blur-2xl animate-soft-fade-up">
     <div className="px-4 pb-3 pt-4">
       <div className="flex items-center gap-3 rounded-3xl bg-[#FCF8F3]/70 p-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C96C3A] text-sm font-bold text-white shadow-sm">
