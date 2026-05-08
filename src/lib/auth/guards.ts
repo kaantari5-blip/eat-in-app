@@ -17,9 +17,33 @@ export async function requireUser() {
 }
 
 export async function requireCustomer() {
-  return await requireUser();
+  const { supabase, user } = await requireUser();
+
+  const { data: profile } = await (supabase as any)
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || profile.role !== "customer") {
+    redirect("/");
+  }
+
+  return { supabase, user, profile };
 }
 
 export async function requireHotelOwner() {
-  return await requireUser();
+  const { supabase, user } = await requireUser();
+
+  const { data: profile } = await (supabase as any)
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || profile.role !== "hotel_owner") {
+    redirect("/");
+  }
+
+  return { supabase, user, profile };
 }
