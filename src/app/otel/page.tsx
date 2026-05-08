@@ -351,188 +351,139 @@ for (let i = 6; i >= 0; i--) {
 
                 return (
                   <article
-                    key={pkg.id}
-                    className="group relative overflow-hidden rounded-[1.5rem] border border-[#E8D7C7] bg-[#FFFDF9] p-5 shadow-[0_8px_30px_rgba(120,72,36,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#D9B79C] hover:shadow-[0_14px_36px_rgba(120,72,36,0.12)] sm:p-6"
-                  >
-                    {/* Subtle accent bar */}
-                    <span
-                      className={`absolute inset-y-0 left-0 w-1 ${
-                        pkg.is_active ? "bg-[#C96C3A]" : "bg-[#D9C7B6]"
-                      }`}
-                      aria-hidden="true"
-                    />
-<div className="-mx-5 -mt-5 mb-5 h-52 overflow-hidden rounded-t-[1.5rem] sm:-mx-6 sm:-mt-6">
-  <img
-    src={pkg.image_url || "/placeholder.jpg"}
-    alt={pkg.title}
-    className="h-full w-full object-cover"
+  key={pkg.id}
+  className="group relative overflow-hidden rounded-[1.75rem] border border-[#E8D7C7] bg-[#FFFDF9] p-4 shadow-[0_8px_30px_rgba(120,72,36,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#D9B79C] hover:shadow-[0_14px_36px_rgba(120,72,36,0.12)] sm:p-5"
+>
+  <span
+    className={`absolute inset-y-0 left-0 w-1 ${
+      pkg.is_active ? "bg-[#C96C3A]" : "bg-[#D9C7B6]"
+    }`}
+    aria-hidden="true"
   />
 
-  {/* Gradient overlay */}
-  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-</div>
+  <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch">
+    <div className="relative h-[240px] w-full shrink-0 overflow-hidden rounded-[1.4rem] lg:h-auto lg:w-[42%]">
+      <img
+        src={pkg.image_url || "/placeholder.jpg"}
+        alt={pkg.title}
+        className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+      />
+    </div>
 
-                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                      <div className="min-w-0 flex-1 space-y-4">
-                        <div>
-                          <p className="inline-flex items-center gap-1.5 text-xs font-medium text-[#8A7768]">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-3.5 w-3.5"
-                              aria-hidden="true"
-                            >
-                              <path d="M3 21h18" />
-                              <path d="M5 21V7l8-4v18" />
-                              <path d="M19 21V11l-6-4" />
-                            </svg>
-                            {pkg.hotel_name}
-                          </p>
-                          <h3 className="mt-1.5 text-xl font-semibold tracking-tight text-[#2B1E16] sm:text-2xl">
-                            {pkg.title}
-                          </h3>
-                        </div>
+    <div className="flex min-w-0 flex-1 flex-col justify-center gap-5 py-1 lg:py-4">
+      <div>
+        <p className="inline-flex items-center gap-1.5 text-xs font-medium text-[#8A7768]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-3.5 w-3.5"
+            aria-hidden="true"
+          >
+            <path d="M3 21h18" />
+            <path d="M5 21V7l8-4v18" />
+            <path d="M19 21V11l-6-4" />
+          </svg>
+          {pkg.hotel_name}
+        </p>
 
-                        <div className="flex flex-wrap gap-2">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F7EEE4] px-3 py-1 text-xs font-medium text-[#7A5D49]">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-3.5 w-3.5"
-                              aria-hidden="true"
-                            >
-                              <circle cx="12" cy="12" r="10" />
-                              <path d="M12 6v6l4 2" />
-                            </svg>
-                            Teslim alma: {pkg.pickup_start} - {pkg.pickup_end}
-                          </span>
+        <h3 className="mt-2 text-2xl font-bold tracking-tight text-[#2B1E16] sm:text-3xl">
+          {pkg.title}
+        </h3>
+      </div>
 
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EEF5ED] px-3 py-1 text-xs font-medium text-[#48634C]">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#48634C]" />
-                            {getCategoryLabel(pkg.category)}
-                          </span>
+      <div className="flex flex-wrap gap-2">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F7EEE4] px-3 py-1 text-xs font-medium text-[#7A5D49]">
+          Teslim alma: {pkg.pickup_start} - {pkg.pickup_end}
+        </span>
 
-                          <span
-                            className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${stockBadge.className}`}
-                          >
-                            <span
-                              className={`h-2 w-2 rounded-full ${stockBadge.dot}`}
-                            />
-                            {stockBadge.text}
-                          </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EEF5ED] px-3 py-1 text-xs font-medium text-[#48634C]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#48634C]" />
+          {getCategoryLabel(pkg.category)}
+        </span>
 
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF3E6] px-3 py-1 text-xs font-medium text-[#7A4526]">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-3.5 w-3.5"
-                              aria-hidden="true"
-                            >
-                              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                              <path d="m3.3 7 8.7 5 8.7-5" />
-                              <path d="M12 22V12" />
-                            </svg>
-                            Stok: {pkg.quantity ?? 0}
-                          </span>
+        <span
+          className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${stockBadge.className}`}
+        >
+          <span className={`h-2 w-2 rounded-full ${stockBadge.dot}`} />
+          {stockBadge.text}
+        </span>
 
-                          <span
-                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
-                              pkg.is_active
-                                ? "bg-[#EEF5ED] text-[#48634C]"
-                                : "bg-[#F6EFE7] text-[#8A5B3D]"
-                            }`}
-                          >
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${
-                                pkg.is_active ? "bg-[#48634C]" : "bg-[#B58A6B]"
-                              }`}
-                            />
-                            {pkg.is_active ? "Aktif" : "Pasif"}
-                          </span>
-                        </div>
-                      </div>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF3E6] px-3 py-1 text-xs font-medium text-[#7A4526]">
+          Stok: {pkg.quantity ?? 0}
+        </span>
 
-                      <div className="flex w-full flex-col gap-4 border-t border-dashed border-[#E8D7C7] pt-4 lg:w-auto lg:min-w-[200px] lg:items-end lg:border-l lg:border-t-0 lg:border-dashed lg:pl-6 lg:pt-0">
-                        <div className="flex items-baseline gap-2 lg:flex-col lg:items-end lg:gap-1">
-                          <p className="text-sm text-[#A08B7C] line-through">
-                            {pkg.original_price}₺
-                          </p>
-                          <p className="text-3xl font-bold tracking-tight text-[#7A4526] sm:text-4xl">
-                            {pkg.price}₺
-                          </p>
-                        </div>
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
+            pkg.is_active
+              ? "bg-[#EEF5ED] text-[#48634C]"
+              : "bg-[#F6EFE7] text-[#8A5B3D]"
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              pkg.is_active ? "bg-[#48634C]" : "bg-[#B58A6B]"
+            }`}
+          />
+          {pkg.is_active ? "Aktif" : "Pasif"}
+        </span>
+      </div>
 
-                        <div className="grid w-full grid-cols-2 gap-2 lg:grid-cols-1 lg:gap-2.5">
-                          <Link
-                            href={`/otel/duzenle/${pkg.id}`}
-                            className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-2xl border border-[#D9B79C] bg-white px-4 py-2.5 text-sm font-semibold text-[#5A3A27] transition hover:bg-[#FFF4EA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C96C3A]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFDF9] active:translate-y-px lg:col-span-1"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-4 w-4"
-                              aria-hidden="true"
-                            >
-                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                            </svg>
-                            Düzenle
-                          </Link>
+      <div className="hidden border-t border-[#EFE4D6] pt-5 text-sm leading-7 text-[#6B5B4D] lg:block">
+        Gün sonunda değerlendirilecek ürünlerden hazırlanan sürpriz kutu.
+      </div>
+    </div>
 
-                          <form
-                            action={togglePackageStatus.bind(
-                              null,
-                              pkg.id,
-                              !pkg.is_active
-                            )}
-                            className="w-full"
-                          >
-                            <SubmitButton
-                              pendingText="Güncelleniyor..."
-                              className={`w-full rounded-2xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFDF9] active:translate-y-px ${
-                                pkg.is_active
-                                  ? "border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 focus-visible:ring-red-300"
-                                  : "border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 focus-visible:ring-green-300"
-                              }`}
-                            >
-                              {pkg.is_active ? "Pasife Al" : "Aktif Et"}
-                            </SubmitButton>
-                          </form>
+    <div className="flex w-full flex-col justify-center gap-4 border-t border-dashed border-[#E8D7C7] pt-4 lg:w-[210px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+      <div className="text-left lg:text-right">
+        <p className="text-sm text-[#A08B7C] line-through">
+          {pkg.original_price}₺
+        </p>
+        <p className="text-4xl font-extrabold tracking-tight text-[#7A4526]">
+          {pkg.price}₺
+        </p>
+      </div>
 
-                          <form
-                            action={deletePackage.bind(null, pkg.id)}
-                            className="w-full"
-                          >
-                            <SubmitButton
-                              pendingText="Siliniyor..."
-                              className="w-full rounded-2xl border border-[#F2C9C9] bg-white px-4 py-2.5 text-sm font-semibold text-[#C45A5A] transition hover:bg-[#FFF5F5] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFFDF9] active:translate-y-px"
-                            >
-                              Sil
-                            </SubmitButton>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
+      <div className="grid w-full grid-cols-2 gap-2 lg:grid-cols-1">
+        <Link
+          href={`/otel/duzenle/${pkg.id}`}
+          className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-2xl border border-[#D9B79C] bg-white px-4 py-3 text-sm font-semibold text-[#5A3A27] transition hover:bg-[#FFF4EA] lg:col-span-1"
+        >
+          Düzenle
+        </Link>
+
+        <form
+          action={togglePackageStatus.bind(null, pkg.id, !pkg.is_active)}
+          className="w-full"
+        >
+          <SubmitButton
+            pendingText="Güncelleniyor..."
+            className={`w-full rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              pkg.is_active
+                ? "border border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                : "border border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+            }`}
+          >
+            {pkg.is_active ? "Pasife Al" : "Aktif Et"}
+          </SubmitButton>
+        </form>
+
+        <form action={deletePackage.bind(null, pkg.id)} className="w-full">
+          <SubmitButton
+            pendingText="Siliniyor..."
+            className="w-full rounded-2xl border border-[#F2C9C9] bg-white px-4 py-3 text-sm font-semibold text-[#C45A5A] transition hover:bg-[#FFF5F5]"
+          >
+            Sil
+          </SubmitButton>
+        </form>
+      </div>
+    </div>
+  </div>
+</article>
                 );
               })}
             </div>
