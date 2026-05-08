@@ -107,7 +107,7 @@ export default async function Navbar() {
         </nav>
 
         <details className="relative md:hidden">
-  <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-[#E7D4C4] bg-white/80 text-[#5A3A27] shadow-sm backdrop-blur transition active:scale-95">
+  <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-[#E7D4C4] bg-white/80 text-[#5A3A27] shadow-sm backdrop-blur transition active:scale-95" active-press>
     <span className="text-xl leading-none">☰</span>
   </summary>
 
