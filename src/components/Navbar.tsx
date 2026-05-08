@@ -26,12 +26,12 @@ export default async function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#E7D4C4] bg-white/70 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 sm:px-6">
         <Link href="/" className="flex items-center">
   <img
     src="/logo.png"
     alt="Eat In"
-    className="h-44 w-auto object-contain"
+    className="h-16 w-auto object-contain"
   />
 </Link>
 
