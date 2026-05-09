@@ -78,21 +78,33 @@ export default async function FavoritesPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-[1.75rem] border border-dashed border-[#D9B79C] bg-white/70 p-12 text-center">
-              <p className="text-lg font-semibold text-[#5A3A27]">
-                Henüz favori kutun yok
-              </p>
-              <p className="mt-2 text-sm text-[#8A7768]">
-                Beğendiğin kutuları favorilere ekleyip burada tekrar
-                görüntüleyebilirsin.
-              </p>
-              <Link
-                href="/"
-                className="mt-5 inline-flex rounded-2xl bg-[#C96C3A] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#B85E2E]"
-              >
-                Kutuları Keşfet
-              </Link>
-            </div>
+          <div className="relative overflow-hidden rounded-[2rem] border border-dashed border-[#D9B79C] bg-white/80 p-10 text-center shadow-[0_8px_30px_rgba(120,72,36,0.06)] sm:p-14">
+  <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#FFE8C9]/50 blur-2xl" />
+  <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#EEF5ED]/70 blur-2xl" />
+
+  <div className="relative mx-auto flex max-w-md flex-col items-center">
+    <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-[#FFF3E6] to-[#FFE1C7] text-4xl shadow-inner">
+      ♡
+    </div>
+
+    <p className="mt-6 text-2xl font-bold text-[#2B1E16]">
+      Henüz favori kutun yok
+    </p>
+
+    <p className="mt-3 text-sm leading-6 text-[#8A7768]">
+      Beğendiğin sürpriz kutuları kalp ikonuna basarak kaydedebilirsin.
+      Favorilerin burada hızlıca erişilebilir olur.
+    </p>
+
+    <Link
+      href="/"
+      className="mt-7 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#C96C3A] to-[#B85E2E] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(201,108,58,0.25)] transition hover:shadow-[0_12px_28px_rgba(201,108,58,0.35)] active:scale-[0.98]"
+    >
+      Kutuları Keşfet
+      <span aria-hidden="true">→</span>
+    </Link>
+  </div>
+</div>
           )}
         </section>
       </div>
